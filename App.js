@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -6,108 +6,149 @@ export default function App() {
     const [tarefaAtual, setTarefaAtual] = useState('');
     const [listaTarefas, setListaTarefas] = useState([]);
 
-    function adicionarTarefa() {
-        if (tarefaAtual.trim() === '') return;
-
-        setListaTarefas([...listaTarefas, tarefaAtual]);
+    const handleAdicionarTarefa = () => {
+        if (tarefaAtual.trim() === '') {
+            return;
+        }
+        const novaLista = [...listaTarefas, tarefaAtual];
+        setListaTarefas(novaLista);
+        salvarDadosLocal(novaLista);
         setTarefaAtual('');
-    }
-    const salvarTeste = async () => {
-        await AsyncStorage.setItem('chave_secreta', 'Felipe');
-        console.log('Teste salvo no cofre!');
+    };
+
+    const salvarDadosLocal = async (listaDeDados) => {
+        const dadosJSON = JSON.stringify(listaDeDados);
+        await AsyncStorage.setItem('minhas_tarefas', dadosJSON);
+    };
+    const resgatarDadoslocal = async () => {
+        const dadosJSONLidos = await AsyncStorage.getItem('minhas_tarefas');
+
+        if (dadosJSONLidos !== null) {
+            const listaViva = JSON.parse(dadosJSONLidos);
+            setListaTarefas(listaViva);
+        }
     };
 
     return (
-        <View style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.title}>Minhas Tarefas</Text>
-            </View>
-            <View style={styles.inputContainer}>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Digite a anotação..."
-                    placeholderTextColor="#888"
-                    value={tarefaAtual}
-                    onChangeText={setTarefaAtual}
-                />
+        useEffect(() => {
+            resgatarDadoslocal();
+        }, []),
+        (
+            <View style={styles.container}>
+                <View style={styles.blocoUm}></View>
+                <View style={styles.blocoDois}></View>
+                <View style={styles.blocoTres}></View>
 
-                <TouchableOpacity style={styles.button} onPress={adicionarTarefa}>
-                    <Text style={styles.buttonText}>+</Text>
-                </TouchableOpacity>
-                <View style={styles.content}>
-                    <ScrollView style={styles.scrollView}>
-                        {listaTarefas.map((item, index) => (
-                            <View key={index} style={styles.card}>
-                                <Text style={styles.cardText}>{item}</Text>
-                            </View>
-                        ))}
-                    </ScrollView>
+                <Text style={styles.text}>App de Controle de Tarefas e Anotações de Campo!</Text>
+
+                <View style={styles.view}>
+                    <TextInput
+                        style={styles.input}
+                        value={tarefaAtual}
+                        onChangeText={setTarefaAtual}
+                        placeholder="Digite a anotação..."
+                    />
+
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => {
+                            setListaTarefas(() => [...listaTarefas, tarefaAtual]);
+                            handleAdicionarTarefa();
+                        }}>
+                        <Text style={styles.buttonText}>+</Text>
+                    </TouchableOpacity>
                 </View>
+
+                <ScrollView>
+                    {listaTarefas.map((tarefa, index) => (
+                        <Text key={index}>{tarefa}</Text>
+                    ))}
+                </ScrollView>
             </View>
-        </View>
+        )
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F5F5F7',
-        paddingHorizontal: 20,
-        paddingTop: 50,
-    },
-    header: {
-        marginBottom: 20,
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     title: {
-        fontSize: 28,
+        fontSize: 24,
         fontWeight: 'bold',
-        color: '#1C1C1E',
-    },
-    content: {
-        flex: 1,
-    },
-    scrollView: {
-        flex: 1,
-    },
-    card: {
-        backgroundColor: '#FFFFFF',
-        padding: 16,
-        borderRadius: 8,
         marginBottom: 10,
-        borderWidth: 1,
-        borderColor: '#D1D1D6',
     },
-    cardText: {
+    subtitle: {
         fontSize: 16,
-        color: '#1C1C1E',
-    },
-    inputContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        color: '#666',
         marginBottom: 20,
     },
     input: {
-        flex: 1,
-        backgroundColor: '#FFFFFF',
         borderWidth: 1,
-        borderColor: '#D1D1D6',
-        borderRadius: 8,
-        paddingHorizontal: 16,
-        paddingVertical: 14,
-        fontSize: 16,
-        marginRight: 10,
+        borderColor: '#ccc',
+        padding: 10,
+        marginBottom: 10,
+        width: '80%',
     },
     button: {
-        width: 52,
-        height: 52,
-        backgroundColor: '#007AFF',
-        borderRadius: 26,
-        justifyContent: 'center',
-        alignItems: 'center',
+        backgroundColor: '#fcd705',
+        padding: 10,
+        borderRadius: 5,
     },
     buttonText: {
-        color: '#FFFFFF',
-        fontSize: 26,
+        color: '#fff',
         fontWeight: 'bold',
+    },
+    blocoUm: {
+        width: 100,
+        height: 100,
+        backgroundColor: 'red',
+    },
+    blocoDois: {
+        width: 100,
+        height: 100,
+        backgroundColor: 'green',
+    },
+    blocoTres: {
+        width: 100,
+        height: 100,
+        backgroundColor: 'blue',
+    },
+    text: {
+        fontSize: 23,
+        fontWeight: 'bold',
+        padding: 35,
+    },
+    input: {
+        flex: 1,
+        height: 48,
+        padding: 14,
+        borderRadius: 10,
+        borderColor: '#1dc0dd',
+        borderWidth: 2,
+        fontSize: 16,
+    },
+    button: {
+        width: 56,
+        height: 48,
+        marginLeft: 10,
+        padding: 14,
+        borderRadius: 10,
+        backgroundColor: '#167a81',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    buttonText: {
+        color: '#ffffff',
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    view: {
+        flexDirection: 'row',
+        width: 340,
+        paddingHorizontal: 24,
     },
 });
