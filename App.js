@@ -17,17 +17,6 @@ export default function App() {
             <View style={styles.header}>
                 <Text style={styles.title}>Minhas Tarefas</Text>
             </View>
-
-            <View style={styles.content}>
-                <ScrollView style={styles.scrollView}>
-                    {listaTarefas.map((item, index) => (
-                        <View key={index} style={styles.card}>
-                            <Text style={styles.cardText}>{item}</Text>
-                        </View>
-                    ))}
-                </ScrollView>
-            </View>
-
             <View style={styles.inputContainer}>
                 <TextInput
                     style={styles.input}
@@ -40,6 +29,15 @@ export default function App() {
                 <TouchableOpacity style={styles.button} onPress={adicionarTarefa}>
                     <Text style={styles.buttonText}>+</Text>
                 </TouchableOpacity>
+                <View style={styles.content}>
+                    <ScrollView style={styles.scrollView}>
+                        {listaTarefas.map((item, index) => (
+                            <View key={index} style={styles.card}>
+                                <Text style={styles.cardText}>{item}</Text>
+                            </View>
+                        ))}
+                    </ScrollView>
+                </View>
             </View>
         </View>
     );
