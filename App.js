@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function App() {
     const [tarefaAtual, setTarefaAtual] = useState('');
@@ -11,6 +12,10 @@ export default function App() {
         setListaTarefas([...listaTarefas, tarefaAtual]);
         setTarefaAtual('');
     }
+    const salvarTeste = async () => {
+        await AsyncStorage.setItem('chave_secreta', 'Felipe');
+        console.log('Teste salvo no cofre!');
+    };
 
     return (
         <View style={styles.container}>
